@@ -1,0 +1,19 @@
+<h1>
+  Login
+</h1>
+
+<% if session.errors then %>
+<b>Errors</b>
+<ul class="list pl0">
+  <% for _,error in ipairs(session.errors) do %>
+    <li><%- error -%><li>
+  <% end %>
+</ul>
+<% end %>
+
+
+<form method="POST" action="/login">
+  <input type="email" name="email">
+  <input type="password" name="password">
+  <button type="submit">Login</button>
+</form>

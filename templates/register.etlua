@@ -1,0 +1,10 @@
+<h1>
+  Register
+</h1>
+
+<form method="POST" action="/register">
+  <input type="username" name="username">
+  <input type="email" name="email">
+  <input type="password" name="password">
+  <button type="submit">Register</button>
+</form>
