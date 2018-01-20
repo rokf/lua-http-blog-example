@@ -14,38 +14,27 @@ local etlua = require 'etlua'
 local pgmoon = require 'pgmoon'
 local uuid = require 'lua_uuid'
 
-
-local hex = function (str)
-  return string.gsub(str,".",function (c)
-    return string.format("%02x", string.byte(c))
-  end)
-end
-
-local hash_pass = function (pass)
-  local digest = require 'openssl.digest'
-  local sha256 = digest.new('sha256')
-  return hex(sha256:final(pass))
-end
-
--- TODO move into external file
-local config = {
-  host = "127.0.0.1",
-  port = 8000,
-  title = "Blog",
-  pgport = 5432,
-  dbname = "blog",
-  dbuser = "postgres",
-  socket_type = "cqueues"
+-- global variables
+config = dofile('config.lua')
+sessions = {}
+templates = {
+  append = function (self, name, filename)
+    local t_file = assert(io.open(filename))
+    self[name] = etlua.compile(t_file:read('*all'))
+    t_file:close()
+  end
 }
-
-local sessions = {}
-
-local pg = pgmoon.new({
+pg = pgmoon.new({
   host = config.host,
   port = tostring(config.pgport),
   database = config.dbname,
   user = config.dbuser
 })
+
+-- global module imports
+require 'globals'
+require 'controllers.login'
+require 'controllers.register'
 
 assert(pg:connect())
 
@@ -65,39 +54,10 @@ cq:wrap(function ()
   end
 end)
 
--- TEMPLATES
-local templates = {}
-
-local function append_template(name,filename)
-  local t_file = assert(io.open(filename))
-  templates[name] = etlua.compile(t_file:read('*all'))
-  t_file:close()
-end
-
-append_template('index', 'templates/index.etlua') -- wrapper template
-append_template('home', 'templates/home.etlua')
-append_template('login', 'templates/login.etlua')
-append_template('register', 'templates/register.etlua')
-
--- UTILS
-local function view(name,p)
-  local txt = templates.index({
-    title = config.title,
-    session = p.session,
-    content = templates[name](p)
-  })
-  sessions[p.session_id].errors = nil
-  return {
-    txt = txt
-  }
-end
-
-local function redirect(path,s)
-  return {
-    status = s or 302,
-    redirect = path
-  }
-end
+templates:append('index', 'templates/index.etlua') -- wrapper template
+templates:append('home', 'templates/home.etlua')
+templates:append('login', 'templates/login.etlua')
+templates:append('register', 'templates/register.etlua')
 
 -- ROUTES
 r:match({
@@ -105,64 +65,16 @@ r:match({
     ['/'] = function (params)
       return view('home', params)
     end,
-    ['/login'] = function (params)
-      if sessions[params.session_id].user then
-        return redirect('/')
-      else
-        return view('login', params)
-      end
-    end,
+    ['/login'] = login_get,
     ['/logout'] = function (params)
       sessions[params.session_id].user = nil
       return redirect('/')
     end,
-    ['/register'] = function (params)
-      return view('register', params)
-    end
+    ['/register'] = register_get
   },
   POST = {
-    ['/login'] = function (params)
-      local res, err = pg:query(
-        string.format('select name,email,password from users where email = %s',
-          pg:escape_literal(params.query.email)
-        )
-      )
-
-      local pwhash = hash_pass(params.query.password)
-      if res then
-        if res[1].password == pwhash then
-          sessions[params.session_id].user = {
-            email = res[1].email,
-            username = res[1].name
-          }
-        else
-          sessions[params.session_id].errors = {
-            'Incorrect email and password combination'
-          }
-          return redirect('/login')
-        end
-      end
-      return redirect('/')
-    end,
-    ['/register'] = function (params)
-      local res, err = pg:query(
-        string.format('insert into users (name, email, password, created_at) values (%s,%s,%s,localtimestamp)',
-          pg:escape_literal(params.query.username),
-          pg:escape_literal(params.query.email),
-          pg:escape_literal(hash_pass(params.query.password))
-        )
-      )
-
-      if res then
-        sessions[params.session_id].user = {
-          email = params.query.email,
-          username = params.query.username,
-        }
-      end
-
-      print(res, err)
-      return redirect('/')
-    end
+    ['/login'] = login_post,
+    ['/register'] = register_post
   }
 })
 
