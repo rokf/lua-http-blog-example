@@ -34,3 +34,27 @@ csrf_token = function (sid)
   sessions[sid].csrf = csrf
   return string.format('<input type="hidden" name="csrf_token" value="%s">', csrf)
 end
+
+gen_ct = function (path)
+  if string.match(path, "%.png$") then
+    return "image/png"
+  elseif string.match(path, "%.jpeg$") then
+    return "image/jpeg"
+  elseif string.match(path, "%.gif$") then
+    return "image/gif"
+  elseif string.match(path, "%.svg$") then
+    return "image/svg+xml"
+  elseif string.match(path, "%.css$") then
+    return "text/css"
+  elseif string.match(path, "%.[x]?htm[l]?$") then
+    return "text/html; charset=utf-8"
+  elseif string.match(path, "%.wav$") then
+    return "audio/wave"
+  elseif string.match(path, "%.webm$") then
+    return "video/webm"
+  elseif string.match(path, "%.ogg$") then
+    return "audio/ogg"
+  else
+    return "text/plain"
+  end
+end

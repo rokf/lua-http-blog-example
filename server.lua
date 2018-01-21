@@ -34,9 +34,9 @@ pg = pgmoon.new({
   host = config.host,
   port = tostring(config.pgport),
   database = config.dbname,
-  user = config.dbuser
+  user = config.dbuser,
+  socket_type = config.socket_type
 })
-
 
 assert(pg:connect())
 
@@ -89,62 +89,80 @@ cq:wrap(function ()
       resh:append("date", util.imf_date())
 
       local just_path = string.match(path,'([^?]*)')
+      local static_path = string.match(just_path,'/(static/.+)')
       local just_query = string.match(path,'%?(.+)')
 
-      local body = assert(st:get_body_as_string())
-
-      if method == "POST" then
-        just_query = body
-      end
-
-      local url_query = {}
-      if just_query ~= nil and just_query ~= '' then
-        for name,value in util.query_args(just_query) do
-          url_query[name] = value
+      if static_path ~= nil or just_path == '/favicon.ico' and method == "GET" then
+        local p = static_path and static_path or  'static' .. just_path
+        local file = io.open(p,'rb')
+        if file ~= nil then
+          print('serving static', p)
+          resh:upsert(":status", "200")
+          resh:append("content-type", gen_ct(p))
+          st:write_headers(resh, false)
+          st:write_body_from_file(file)
+          file:close()
+        else
+          resh:upsert(":status", "404")
+          -- resh:append("content-type", "text/plain; charset=utf-8")
+          st:write_headers(resh, true)
         end
-      end
-
-      local cookie_sequence = reqh:get_as_sequence('cookie') or {}
-      local session_id = nil -- session_id of this request
-
-      for _,cookie in ipairs(cookie_sequence) do
-        local k,v = string.match(cookie,'([^=]+)=([^;]+)')
-        if k == "session_id" then session_id = v end
-      end
-
-      if session_id == nil or sessions[session_id] == nil then
-        session_id = uuid()
-        resh:upsert('set-cookie','session_id=' .. session_id, true)
-        sessions[session_id] = {
-          created_at = os.time()
-        }
-      end
-
-      print('session_id', session_id, sessions[session_id].created_at)
-
-      local route_data = {
-        query = url_query,
-        body = body,
-        session_id = session_id,
-        session = sessions[session_id]
-      }
-
-      local route_found, data = r:execute(method, just_path, route_data)
-
-      if not route_found then
-        resh:upsert(':status','404')
-        resh:upsert('content-type','text/html')
-        st:write_headers(resh, false)
-        st:write_body_from_string('404 not found!')
       else
-        resh:upsert(':status',tostring(data.status or 200))
-        resh:upsert('content-type','text/html')
-        if data.redirect then
-          resh:upsert('Location',data.redirect)
+        local body = assert(st:get_body_as_string())
+        if method == "POST" then
+          just_query = body
         end
-        st:write_headers(resh, false)
-        if not data.redirect then
-          st:write_body_from_string(data.txt)
+
+        local url_query = {}
+        if just_query ~= nil and just_query ~= '' then
+          for name,value in util.query_args(just_query) do
+            url_query[name] = value
+          end
+        end
+
+        local cookie_sequence = reqh:get_as_sequence('cookie') or {}
+        local session_id = nil -- session_id of this request
+
+        for _,cookie in ipairs(cookie_sequence) do
+          local k,v = string.match(cookie,'([^=]+)=([^;]+)')
+          if k == "session_id" then session_id = v end
+        end
+
+        if session_id == nil or sessions[session_id] == nil then
+          session_id = uuid()
+          resh:upsert('set-cookie','session_id=' .. session_id, true)
+          sessions[session_id] = {
+            created_at = os.time()
+          }
+        end
+
+        -- print('session_id', session_id, sessions[session_id].created_at)
+
+        local route_data = {
+          query = url_query,
+          body = body,
+          session_id = session_id,
+          session = sessions[session_id]
+        }
+
+        local route_found, data = r:execute(method, just_path, route_data)
+
+        if not route_found then
+          resh:upsert(':status','404')
+          resh:upsert('content-type','text/html')
+          st:write_headers(resh, false)
+          st:write_body_from_string('404 not found!')
+        else
+          print('serving dynamic', just_path)
+          resh:upsert(':status',tostring(data.status or 200))
+          resh:upsert('content-type','text/html')
+          if data.redirect then
+            resh:upsert('Location',data.redirect)
+          end
+          st:write_headers(resh, false)
+          if not data.redirect then
+            st:write_body_from_string(data.txt)
+          end
         end
       end
     end
