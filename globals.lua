@@ -10,7 +10,7 @@ hash_pass = function (pass)
   return hex(sha256:final(pass))
 end
 
-function view(name,p)
+view = function (name,p)
   local txt = templates.index({
     title = config.title,
     session = p.session,
@@ -22,9 +22,15 @@ function view(name,p)
   }
 end
 
-function redirect(path,s)
+redirect = function (path,s)
   return {
     status = s or 302,
     redirect = path
   }
+end
+
+csrf_token = function (sid)
+  local csrf = uuid()
+  sessions[sid].csrf = csrf
+  return string.format('<input type="hidden" name="csrf_token" value="%s">', csrf)
 end

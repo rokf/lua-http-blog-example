@@ -12,7 +12,13 @@ local r = router.new()
 
 local etlua = require 'etlua'
 local pgmoon = require 'pgmoon'
-local uuid = require 'lua_uuid'
+
+-- global module imports
+uuid = require 'lua_uuid'
+require 'globals'
+require 'controllers.login'
+require 'controllers.register'
+require 'controllers.logout'
 
 -- global variables
 config = dofile('config.lua')
@@ -31,10 +37,6 @@ pg = pgmoon.new({
   user = config.dbuser
 })
 
--- global module imports
-require 'globals'
-require 'controllers.login'
-require 'controllers.register'
 
 assert(pg:connect())
 
@@ -48,7 +50,7 @@ cq:wrap(function ()
   while true do
     signo = sl:wait(0.5)
     if signo == signal.SIGINT then
-      print('\nINTERRUPTED!')
+      pg:disconnect()
       os.exit(true)
     end
   end
@@ -59,17 +61,11 @@ templates:append('home', 'templates/home.etlua')
 templates:append('login', 'templates/login.etlua')
 templates:append('register', 'templates/register.etlua')
 
--- ROUTES
 r:match({
   GET = {
-    ['/'] = function (params)
-      return view('home', params)
-    end,
+    ['/'] = function (params) return view('home', params) end,
     ['/login'] = login_get,
-    ['/logout'] = function (params)
-      sessions[params.session_id].user = nil
-      return redirect('/')
-    end,
+    ['/logout'] = logout_get,
     ['/register'] = register_get
   },
   POST = {
@@ -78,7 +74,6 @@ r:match({
   }
 })
 
--- MAIN LOOP
 cq:wrap(function ()
   local s = server.listen({
     host = config.host,

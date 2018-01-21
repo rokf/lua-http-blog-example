@@ -8,6 +8,10 @@ function login_get(params)
 end
 
 function login_post(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then
+    return redirect('/')
+  end
+
   local res, err = pg:query(
     string.format('select name,email,password from users where email = %s',
       pg:escape_literal(params.query.email)

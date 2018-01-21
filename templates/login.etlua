@@ -13,6 +13,7 @@
 
 
 <form method="POST" action="/login">
+  <%- csrf_token(session_id) -%>
   <input type="email" name="email">
   <input type="password" name="password">
   <button type="submit">Login</button>
