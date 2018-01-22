@@ -1,14 +1,3 @@
 <h1>
-  Home
+  Articles
 </h1>
-
-<% if session.user then %>
-<ul>
-  <li>
-    <%- session.user.username -%>
-  </li>
-  <li>
-    <%- session.user.email -%>
-  </li>
-</ul>
-<% end %>

@@ -5,5 +5,6 @@ return {
   pgport = 5432,
   dbname = "blog",
   dbuser = "postgres",
-  socket_type = "cqueues"
+  socket_type = "cqueues",
+  dev = true
 }

@@ -13,6 +13,8 @@ local r = router.new()
 local etlua = require 'etlua'
 local pgmoon = require 'pgmoon'
 
+local lfs = require 'lfs'
+
 -- global module imports
 uuid = require 'lua_uuid'
 require 'globals'
@@ -24,7 +26,7 @@ require 'controllers.logout'
 config = dofile('config.lua')
 sessions = {}
 templates = {
-  append = function (self, name, filename)
+  upsert = function (self, name, filename)
     local t_file = assert(io.open(filename))
     self[name] = etlua.compile(t_file:read('*all'))
     t_file:close()
@@ -56,10 +58,43 @@ cq:wrap(function ()
   end
 end)
 
-templates:append('index', 'templates/index.etlua') -- wrapper template
-templates:append('home', 'templates/home.etlua')
-templates:append('login', 'templates/login.etlua')
-templates:append('register', 'templates/register.etlua')
+template_pairs = {
+  ['templates/index.etlua'] = {
+    name = 'index'
+  },
+  ['templates/home.etlua'] = {
+    name = 'home'
+  },
+  ['templates/login.etlua'] = {
+    name = 'login'
+  },
+  ['templates/register.etlua'] = {
+    name = 'register'
+  }
+}
+
+for pth,tidx in pairs(template_pairs) do
+  templates:upsert(tidx.name,pth)
+end
+
+if config.dev then
+  cq:wrap(function ()
+    while true do
+      for tf in lfs.dir('templates') do
+        if tf ~= "." and tf ~= ".." then
+          local tfp = 'templates/' .. tf
+          local modified = lfs.attributes(tfp,'modification')
+          if template_pairs[tfp].modified == nil or template_pairs[tfp].modified < modified then
+            template_pairs[tfp].modified = modified
+            templates:upsert(template_pairs[tfp].name,tfp)
+            print('updated', tfp)
+          end
+        end
+      end
+      cqueues.sleep(0.5)
+    end
+  end)
+end
 
 r:match({
   GET = {

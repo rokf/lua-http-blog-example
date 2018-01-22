@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
-    <link rel="stylesheet" href="static/sheet.css">
   </head>
-  <body class="mw7 center debug">
-    <header>
-      <a href="static/example.txt">Example</a>
+  <body class="mw7 center">
+    <header class="flex justify-between">
+      <a class="f1 link ma0 pa0 code light-red" href="/">Blog</h1>
+      <div class="flex justify-center content-center">
+        <% if session.user then %>
+          <a class="link ph1 pv2 black underline tc" href="/dashboard"><%- session.user.username -%></a>
+          <a class="link ph1 pv2 black underline tc" href="/logout">Logout</a>
+        <% else %>
+          <a class="link ph1 pv2 black underline tc" href="/login">Login</a>
+          <a class="link ph1 pv2 black underline tc" href="/register">Register</a>
+        <% end %>
+      </div>
     </header>
+    <hr>
     <%- content -%>
   </body>
 </html>
