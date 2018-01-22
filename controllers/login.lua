@@ -13,7 +13,7 @@ function login_post(params)
   end
 
   local res, err = pg:query(
-    string.format('select name,email,password from users where email = %s',
+    string.format('select id,name,email,password from users where email = %s',
       pg:escape_literal(params.query.email)
     )
   )
@@ -23,7 +23,8 @@ function login_post(params)
     if res[1].password == pwhash then
       sessions[params.session_id].user = {
         email = res[1].email,
-        username = res[1].name
+        name = res[1].name,
+        id = res[1].id
       }
     else
       sessions[params.session_id].errors = {

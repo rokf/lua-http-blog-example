@@ -1,0 +1,19 @@
+<div class="flex justify-between">
+  <section>
+    <p class="f3 gray">Update profile</p>
+    <form class="flex flex-column" method="POST" action="/dashboard/update_profile">
+      <%- csrf_token(session_id) -%>
+      <input placeholder="name" name="name" class="mb2">
+      <button type="submit">Update</button>
+    </form>
+  </section>
+  <section>
+    <p class="f3 gray">Update E-Mail</p>
+    <form class="flex flex-column" method="POST" action="/dashboard/update_email">
+      <%- csrf_token(session_id) -%>
+      <input placeholder="new email" name="email" class="mb2">
+      <input placeholder="repeat new email" name="email_copy" class="mb2">
+      <button type="submit">Update</button>
+    </form>
+  </section>
+</div>

@@ -21,6 +21,7 @@ require 'globals'
 require 'controllers.login'
 require 'controllers.register'
 require 'controllers.logout'
+require 'controllers.dashboard'
 
 -- global variables
 config = dofile('config.lua')
@@ -70,6 +71,9 @@ template_pairs = {
   },
   ['templates/register.etlua'] = {
     name = 'register'
+  },
+  ['templates/dashboard.etlua'] = {
+    name = 'dashboard'
   }
 }
 
@@ -96,16 +100,20 @@ if config.dev then
   end)
 end
 
+--> ROUTES
 r:match({
   GET = {
     ['/'] = function (params) return view('home', params) end,
     ['/login'] = login_get,
     ['/logout'] = logout_get,
-    ['/register'] = register_get
+    ['/register'] = register_get,
+    ['/dashboard'] = dashboard_get
   },
   POST = {
     ['/login'] = login_post,
-    ['/register'] = register_post
+    ['/register'] = register_post,
+    ['/dashboard/update_profile'] = dashboard_update_profile,
+    ['/dashboard/update_email'] = dashboard_update_email
   }
 })
 

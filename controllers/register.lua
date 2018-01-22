@@ -10,16 +10,23 @@ function register_post(params)
 
   local res, err = pg:query(
     string.format('insert into users (name, email, password, created_at) values (%s,%s,%s,localtimestamp)',
-      pg:escape_literal(params.query.username),
+      pg:escape_literal(params.query.name),
       pg:escape_literal(params.query.email),
       pg:escape_literal(hash_pass(params.query.password))
     )
   )
 
-  if res then
+  local res2, err2 = pg:query(
+    string.format('select id, email from users where email = %s',
+      pg:escape_literal(params.query.email)
+    )
+  )
+
+  if res and res2 then
     sessions[params.session_id].user = {
       email = params.query.email,
-      username = params.query.username,
+      name = params.query.name,
+      id = res2[1].id,
     }
   end
 

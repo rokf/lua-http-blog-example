@@ -4,7 +4,7 @@
 
 <form method="POST" action="/register">
   <%- csrf_token(session_id) -%>
-  <input type="username" name="username">
+  <input type="name" name="name">
   <input type="email" name="email">
   <input type="password" name="password">
   <button type="submit">Register</button>
