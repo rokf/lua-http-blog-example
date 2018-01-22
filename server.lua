@@ -113,7 +113,8 @@ r:match({
     ['/login'] = login_post,
     ['/register'] = register_post,
     ['/dashboard/update_profile'] = dashboard_update_profile,
-    ['/dashboard/update_email'] = dashboard_update_email
+    ['/dashboard/update_email'] = dashboard_update_email,
+    ['/dashboard/update_password'] = dashboard_update_password
   }
 })
 
