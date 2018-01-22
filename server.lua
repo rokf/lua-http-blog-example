@@ -17,6 +17,7 @@ local lfs = require 'lfs'
 
 -- global module imports
 uuid = require 'lua_uuid'
+serpent = require 'serpent'
 require 'globals'
 require 'controllers.login'
 require 'controllers.register'
@@ -180,7 +181,9 @@ cq:wrap(function ()
           }
         end
 
-        -- print('session_id', session_id, sessions[session_id].created_at)
+        if method == "GET" then
+          sessions[session_id].csrf = nil
+        end
 
         local route_data = {
           query = url_query,
@@ -199,7 +202,11 @@ cq:wrap(function ()
         else
           print('serving dynamic', just_path)
           resh:upsert(':status',tostring(data.status or 200))
-          resh:upsert('content-type','text/html')
+          if data.ctype then
+            resh:upsert('content-type', data.ctype)
+          else
+            resh:upsert('content-type','text/html')
+          end
           if data.redirect then
             resh:upsert('Location',data.redirect)
           end

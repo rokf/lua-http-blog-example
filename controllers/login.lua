@@ -1,4 +1,3 @@
-
 function login_get(params)
   if sessions[params.session_id].user then
     return redirect('/')
@@ -19,12 +18,15 @@ function login_post(params)
   )
 
   local pwhash = hash_pass(params.query.password)
-  if res then
+  if res ~= nil and #res > 0 then
     if res[1].password == pwhash then
       sessions[params.session_id].user = {
         email = res[1].email,
         name = res[1].name,
         id = res[1].id
+      }
+      sessions[params.session_id].messages = {
+        'Welcome back ' .. res[1].name .. '!'
       }
     else
       sessions[params.session_id].errors = {
@@ -32,6 +34,10 @@ function login_post(params)
       }
       return redirect('/login')
     end
+  else
+    sessions[params.session_id].errors = {
+      'There is no registered user with this email'
+    }
   end
   return redirect('/')
 end

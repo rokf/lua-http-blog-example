@@ -17,6 +17,7 @@ view = function (name,p)
     content = templates[name](p)
   })
   sessions[p.session_id].errors = nil
+  sessions[p.session_id].messages = nil
   return {
     txt = txt
   }
@@ -29,10 +30,16 @@ redirect = function (path,s)
   }
 end
 
+dd = function (data)
+  return {
+    ctype = 'text/plain',
+    txt = serpent.block(data,{comment=false})
+  }
+end
+
 csrf_token = function (sid)
-  local csrf = uuid()
-  sessions[sid].csrf = csrf
-  return string.format('<input type="hidden" name="csrf_token" value="%s">', csrf)
+  if sessions[sid].csrf == nil then sessions[sid].csrf = uuid() end
+  return string.format('<input type="hidden" name="csrf_token" value="%s">', sessions[sid].csrf)
 end
 
 gen_ct = function (path)

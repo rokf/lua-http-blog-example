@@ -19,6 +19,24 @@
         <% end %>
       </div>
     </header>
+    <% if session.errors then %>
+      <div class="mv3 bg-washed-red pa2 br3">
+        <ul class="list pl0">
+          <% for _,error in ipairs(session.errors) do %>
+            <li class="dark-red"><%- error -%><li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <% if session.messages then %>
+      <div class="mv3 bg-washed-green pa2 br3">
+        <ul class="list pl0">
+          <% for _,message in ipairs(session.messages) do %>
+            <li class="dark-green"><%- message -%><li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <hr>
     <%- content -%>
   </body>

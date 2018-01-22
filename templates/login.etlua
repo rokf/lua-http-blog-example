@@ -1,20 +1,6 @@
-<h1>
-  Login
-</h1>
-
-<% if session.errors then %>
-<b>Errors</b>
-<ul class="list pl0">
-  <% for _,error in ipairs(session.errors) do %>
-    <li><%- error -%><li>
-  <% end %>
-</ul>
-<% end %>
-
-
-<form method="POST" action="/login">
+<form class="flex flex-column mw5" method="POST" action="/login">
   <%- csrf_token(session_id) -%>
-  <input type="email" name="email">
-  <input type="password" name="password">
+  <input type="email" name="email" placeholder="email" class="mb2">
+  <input type="password" name="password" placeholder="password" class="mb2">
   <button type="submit">Login</button>
 </form>

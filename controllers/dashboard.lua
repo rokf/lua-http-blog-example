@@ -7,6 +7,10 @@ function dashboard_get(params)
 end
 
 function dashboard_update_profile(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then
+    return redirect('/')
+  end
+
   if sessions[params.session_id].user ~= nil then
     local res, err = pg:query(
       string.format('update users set name = %s where id = %d',
@@ -22,6 +26,10 @@ function dashboard_update_profile(params)
 end
 
 function dashboard_update_email(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then
+    return redirect('/')
+  end
+
   if sessions[params.session_id].user ~= nil and
     params.query.email == params.query.email_copy then
     local res, err = pg:query(
@@ -38,6 +46,10 @@ function dashboard_update_email(params)
 end
 
 function dashboard_update_password(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then
+    return redirect('/')
+  end
+
   if sessions[params.session_id].user ~= nil and
     params.query.password == params.query.password_copy then
     -- check old password
