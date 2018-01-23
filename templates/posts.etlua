@@ -1,3 +1,7 @@
-<h1>
-  Posts
-</h1>
+<% for _,post in ipairs(posts) do %>
+<div>
+  <h3 class="f3"><%- post.title -%></h3>
+  <p>by <%- post.author -%></p>
+  <p><%- post.article -%></p>
+</div>
+<% end %>

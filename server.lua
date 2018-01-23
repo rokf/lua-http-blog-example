@@ -4,6 +4,10 @@ local headers = require 'http.headers'
 local version = require 'http.version'
 local util = require 'http.util'
 
+function drpl(i)
+  return string.gsub(util.decodeURI(i),'%+',' ')
+end
+
 local cqueues = require 'cqueues'
 local signal = require 'cqueues.signal'
 

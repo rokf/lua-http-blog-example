@@ -10,6 +10,14 @@ hash_pass = function (pass)
   return hex(sha256:final(pass))
 end
 
+shallow_clone = function (t)
+  local nt = {}
+  for k,v in pairs(t) do
+    nt[k] = v
+  end
+  return nt
+end
+
 view = function (name,p)
   local txt = templates.index({
     title = config.title,
