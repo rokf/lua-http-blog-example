@@ -121,8 +121,8 @@ r:match({
     ['/register'] = register_get,
     ['/dashboard'] = dashboard_get,
     ['/posts'] = post_all_get,
+    ['/new_post'] = post_new_get,
     ['/posts/:postid'] = post_single_get,
-    ['/posts/new'] = post_new_get,
   },
   POST = {
     ['/login'] = login_post,
@@ -130,7 +130,7 @@ r:match({
     ['/dashboard/update_profile'] = dashboard_update_profile,
     ['/dashboard/update_email'] = dashboard_update_email,
     ['/dashboard/update_password'] = dashboard_update_password,
-    ['/posts/new'] = post_new_post
+    ['/new_post'] = post_new_post
   }
 })
 
@@ -183,10 +183,14 @@ cq:wrap(function ()
         local cookie_sequence = reqh:get_as_sequence('cookie') or {}
         local session_id = nil -- session_id of this request
 
+        -- look for a session_id cookie
         for _,cookie in ipairs(cookie_sequence) do
           local k,v = string.match(cookie,'([^=]+)=([^;]+)')
-          if k == "session_id" then session_id = v end
+          if k == "session_id" then
+            session_id = v
+          end
         end
+
 
         if session_id == nil or sessions[session_id] == nil then
           session_id = uuid()

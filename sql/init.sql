@@ -9,7 +9,8 @@ create table users (
 create table posts (
   id serial primary key not null,
   title text not null,
-  author integer not null,
+  user_id integer not null,
+  article text not null,
   created_at timestamp,
   updated_at timestamp
 );
