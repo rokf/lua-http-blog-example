@@ -28,6 +28,9 @@ function register_post(params)
       name = params.query.name,
       id = res2[1].id,
     }
+    sessions[params.session_id].messages = {
+      'Welcome to the platform!'
+    }
   end
 
   return redirect('/')

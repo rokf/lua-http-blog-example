@@ -23,6 +23,7 @@ require 'controllers.login'
 require 'controllers.register'
 require 'controllers.logout'
 require 'controllers.dashboard'
+require 'controllers.post'
 
 -- global variables
 config = dofile('config.lua')
@@ -75,6 +76,15 @@ template_pairs = {
   },
   ['templates/dashboard.etlua'] = {
     name = 'dashboard'
+  },
+  ['templates/posts.etlua'] = {
+    name = 'posts'
+  },
+  ['templates/post.etlua'] = {
+    name = 'post'
+  },
+  ['templates/newpost.etlua'] = {
+    name = 'newpost'
   }
 }
 
@@ -104,18 +114,23 @@ end
 --> ROUTES
 r:match({
   GET = {
-    ['/'] = function (params) return view('home', params) end,
+    -- ['/'] = function (params) return view('home', params) end,
+    ['/'] = post_all_get,
     ['/login'] = login_get,
     ['/logout'] = logout_get,
     ['/register'] = register_get,
-    ['/dashboard'] = dashboard_get
+    ['/dashboard'] = dashboard_get,
+    ['/posts'] = post_all_get,
+    ['/posts/:postid'] = post_single_get,
+    ['/posts/new'] = post_new_get,
   },
   POST = {
     ['/login'] = login_post,
     ['/register'] = register_post,
     ['/dashboard/update_profile'] = dashboard_update_profile,
     ['/dashboard/update_email'] = dashboard_update_email,
-    ['/dashboard/update_password'] = dashboard_update_password
+    ['/dashboard/update_password'] = dashboard_update_password,
+    ['/posts/new'] = post_new_post
   }
 })
 
