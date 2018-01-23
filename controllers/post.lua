@@ -1,13 +1,24 @@
 
 function post_all_get(params)
-  local res, err = pg:query('select p.title, u.name as author, p.article from users as u, posts as p where u.id = p.user_id')
+  local res, err = pg:query('select p.id, p.title, u.name as author, p.article from users as u, posts as p where u.id = p.user_id')
   local newparams = shallow_clone(params)
   newparams.posts = res
   return view('posts',newparams)
 end
 
 function post_single_get(params)
-  return view('post', params)
+  local res, err = pg:query(
+    string.format(
+      'select p.id, p.title, u.name as author, p.article from users as u, posts as p where u.id = p.user_id and p.id = %s',
+      params.postid
+    )
+  )
+
+  if res == nil or #res == 0 then return redirect('/') end
+
+  local newparams = shallow_clone(params)
+  newparams.post = res[1]
+  return view('post', newparams)
 end
 
 function post_new_get(params)

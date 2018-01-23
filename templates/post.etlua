@@ -1,3 +1,5 @@
-<h1>
-  Post <%- postid -%>
-</h1>
+<div>
+  <a class="f3 tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
+  <p class="i fw4"><span class="fw1">by</span> <%- post.author -%></p>
+  <p class="f5 lh-copy"><%- post.article -%></p>
+</div>

@@ -8,7 +8,7 @@
   </head>
   <body class="mw7 center">
     <header class="flex justify-between">
-      <a class="f1 link ma0 pa0 code gray" href="/">Blog</h1>
+      <a class="f1 lh-title tracked link ma0 pa0 gray" href="/">Blog</h1>
       <div class="flex justify-center content-center">
         <% if session.user then %>
           <a class="link ph1 pv2 black underline tc" href="/dashboard"><%- session.user.name -%></a>

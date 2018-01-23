@@ -1,7 +1,7 @@
 <% for _,post in ipairs(posts) do %>
 <div>
-  <h3 class="f3"><%- post.title -%></h3>
-  <p>by <%- post.author -%></p>
-  <p><%- post.article -%></p>
+  <a class="f3 tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
+  <p class="i fw4"><span class="fw1">by</span> <%- post.author -%></p>
+  <p class="f5 lh-copy"><%- post.article -%></p>
 </div>
 <% end %>
