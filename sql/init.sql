@@ -14,3 +14,11 @@ create table posts (
   created_at timestamp,
   updated_at timestamp
 );
+
+create table comments (
+  id serial primary key not null,
+  post_id integer not null,
+  user_id integer not null,
+  txt text not null,
+  created_at timestamp
+);

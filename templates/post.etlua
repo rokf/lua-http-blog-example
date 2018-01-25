@@ -1,5 +1,30 @@
+<!-- post display -->
 <div>
   <a class="f3 tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
   <p class="i fw4"><span class="fw1">by</span> <%- post.author -%></p>
   <p class="f5 lh-copy"><%- post.article -%></p>
 </div>
+
+<!-- new comment form -->
+<% if sessions[session_id].user ~= nil then %>
+  <form class="flex flex-column" method="POST" action="/comment">
+    <%- csrf_token(session_id) -%>
+    <input type="hidden" name="postid" value="<%- post.id -%>">
+    <textarea name="txt" rows="3" class="mb2"></textarea>
+    <button type="submit">Add comment</button>
+  </form>
+<% end %>
+
+<!-- comments -->
+<% if #comments > 0 then %>
+<div>
+<p class="f5 i">Comments</p>
+<hr>
+<% for _,c in ipairs(comments) do %>
+  <div class="ph2 pv1 bg-near-white br1 mb2">
+    <p class="i fw4"><span class="fw1">by</span> <%- c.author -%></p>
+    <p class="fw1"><%- c.txt -%></p>
+  </div>
+<% end %>
+</div>
+<% end %>

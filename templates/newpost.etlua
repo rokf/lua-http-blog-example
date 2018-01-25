@@ -1,7 +1,6 @@
 <form class="flex flex-column" method="POST" action="/new_post">
   <%- csrf_token(session_id) -%>
   <input name="title" placeholder="title" class="mb2">
-  <textarea name="article" rows="30" class="mb2">
-  </textarea>
+  <textarea name="article" rows="30" class="mb2"></textarea>
   <button type="submit">Submit</button>
 </form>

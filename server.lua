@@ -19,6 +19,10 @@ local pgmoon = require 'pgmoon'
 
 local lfs = require 'lfs'
 
+-- mime type lookup table
+-- used by global function gen_ct
+lt = dofile('lt.lua')
+
 -- global module imports
 uuid = require 'lua_uuid'
 serpent = require 'serpent'
@@ -28,6 +32,7 @@ require 'controllers.register'
 require 'controllers.logout'
 require 'controllers.dashboard'
 require 'controllers.post'
+require 'controllers.comment'
 
 -- global variables
 config = dofile('config.lua')
@@ -134,7 +139,8 @@ r:match({
     ['/dashboard/update_profile'] = dashboard_update_profile,
     ['/dashboard/update_email'] = dashboard_update_email,
     ['/dashboard/update_password'] = dashboard_update_password,
-    ['/new_post'] = post_new_post
+    ['/new_post'] = post_new_post,
+    ['/comment'] = comment_insert
   }
 })
 

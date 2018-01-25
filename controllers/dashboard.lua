@@ -1,9 +1,8 @@
 function dashboard_get(params)
   if sessions[params.session_id].user == nil then
     return redirect('/')
-  else
-    return view('dashboard', params)
   end
+  return view('dashboard', params)
 end
 
 function dashboard_update_profile(params)
