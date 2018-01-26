@@ -12,6 +12,7 @@
     <td class="pv2 ph3 tr">
       <form method="GET" action="/edit_post">
         <%- csrf_token(session_id) -%>
+        <input type="hidden" name="userid" value="<%- post.user_id -%>">
         <input type="hidden" name="postid" value="<%- post.id -%>">
         <button type="submit">Edit</button>
       </form>

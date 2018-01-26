@@ -1,1 +1,13 @@
-Edit post
+<div>
+  <p class="f2 underline">Editing</p>
+  <form class="flex flex-column" method="POST" action="/edit_post">
+    <%- csrf_token(session_id) -%>
+    <input type="hidden" name="userid" value="<%- post.user_id -%>">
+    <input type="hidden" name="postid" value="<%- post.id -%>">
+    <input name="title" value="<%- post.title -%>" placeholder="title" class="mb2">
+    <textarea name="article" rows="30" class="mb2">
+    <%- post.article -%>
+    </textarea>
+    <button type="submit">Submit</button>
+  </form>
+</div>

@@ -97,10 +97,47 @@ end
 
 -- GET the edit view
 function post_edit_get(params)
-  return view('editpost',params)
+  if sessions[params.session_id].user == nil then return redirect('/') end
+  if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
+  local pid = params.query.postid
+  local uid = params.query.userid
+
+  local res,err = pg:query(
+    string.format(
+      'select id, title, user_id, article from posts where id = %s',
+      pg:escape_literal(params.query.postid)
+    )
+  )
+
+  local newparams = shallow_clone(params)
+  newparams.post = res[1]
+
+  return view('editpost',newparams)
 end
 
 -- POST the edit
 function post_edit_post(params)
+  if sessions[params.session_id].user == nil then return redirect('/') end
+  if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
+
+  local res,err = pg:query(
+    string.format(
+      'update posts set updated_at = localtimestamp, title = %s, article = %s where id = %s',
+      pg:escape_literal(drpl(params.query.title)),
+      pg:escape_literal(drpl(params.query.article)),
+      pg:escape_literal(params.query.postid)
+    )
+  )
+
+  if res ~= nil then
+    sessions[params.session_id].messages = {
+      'Your post has been updated with the new title and content'
+    }
+  else
+    sessions[params.session_id].errors = {
+      'There was an error, the post could not be updated'
+    }
+  end
+
   return redirect('/myposts')
 end
