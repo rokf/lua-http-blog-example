@@ -97,6 +97,9 @@ template_pairs = {
   },
   ['templates/myposts.etlua'] = {
     name = 'myposts'
+  },
+  ['templates/editpost.etlua'] = {
+    name = 'editpost'
   }
 }
 
@@ -135,7 +138,8 @@ r:match({
     ['/posts'] = post_all_get,
     ['/new_post'] = post_new_get,
     ['/posts/:postid'] = post_single_get,
-    ['/myposts'] = post_my_get
+    ['/myposts'] = post_my_get,
+    ['/edit_post'] = post_edit_get
   },
   POST = {
     ['/login'] = login_post,
@@ -144,7 +148,9 @@ r:match({
     ['/dashboard/update_email'] = dashboard_update_email,
     ['/dashboard/update_password'] = dashboard_update_password,
     ['/new_post'] = post_new_post,
-    ['/comment'] = comment_insert
+    ['/comment'] = comment_insert,
+    ['/edit_post'] = post_edit_post,
+    ['/delete_post'] = post_delete
   }
 })
 

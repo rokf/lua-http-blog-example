@@ -61,7 +61,7 @@ function post_my_get(params)
   if sessions[params.session_id].user == nil then return redirect('/') end
   local res, err = pg:query(
     string.format(
-      'select id, title, updated_at from posts where user_id = %d',
+      'select id, title, user_id, updated_at from posts where user_id = %d',
       sessions[params.session_id].user.id
     )
   )
@@ -69,4 +69,38 @@ function post_my_get(params)
   local newparams = shallow_clone(params)
   newparams.posts = res
   return view('myposts', newparams)
+end
+
+-- delete post
+function post_delete(params)
+  if sessions[params.session_id].user == nil then return redirect('/') end
+  if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
+  local res,err = pg:query(
+    string.format(
+      'delete from posts where id = %s',
+      pg:escape_literal(params.query.postid)
+    )
+  )
+
+  if res ~= nil then
+    -- delete comments related to post
+    local res,err = pg:query(
+      string.format(
+        'delete from comments where post_id = %s',
+        pg:escape_literal(params.query.postid)
+      )
+    )
+  end
+
+  return redirect('/myposts')
+end
+
+-- GET the edit view
+function post_edit_get(params)
+  return view('editpost',params)
+end
+
+-- POST the edit
+function post_edit_post(params)
+  return redirect('/myposts')
 end
