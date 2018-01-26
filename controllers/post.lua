@@ -16,7 +16,7 @@ function post_single_get(params)
 
   local res2, err2 = pg:query(
     string.format(
-      'select c.txt, u.name as author from users as u, comments as c where u.id = c.user_id and c.post_id = %s',
+      'select c.txt, u.name as author, c.created_at from users as u, comments as c where u.id = c.user_id and c.post_id = %s',
       params.postid
     )
   )

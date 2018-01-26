@@ -22,7 +22,10 @@
 <hr>
 <% for _,c in ipairs(comments) do %>
   <div class="ph2 pv1 bg-near-white br1 mb2">
-    <p class="i fw4"><span class="fw1">by</span> <%- c.author -%></p>
+    <div class="flex justify-between">
+      <p class="i fw4 f7"><span class="fw1">by</span> <%- c.author -%></p>
+      <p class="i fw1 f7"><%- string.sub(c.created_at,1,19) -%></p>
+    </div>
     <p class="fw1"><%- c.txt -%></p>
   </div>
 <% end %>
