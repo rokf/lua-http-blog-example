@@ -13,6 +13,7 @@
         <% if session.user then %>
           <a class="link ph1 pv2 black underline tc" href="/dashboard"><%- session.user.name -%></a>
           <a class="link ph1 pv2 black underline tc" href="/new_post">Write</a>
+          <a class="link ph1 pv2 black underline tc" href="/myposts">My posts</a>
           <a class="link ph1 pv2 black underline tc" href="/logout">Logout</a>
         <% else %>
           <a class="link ph1 pv2 black underline tc" href="/login">Login</a>

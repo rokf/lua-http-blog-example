@@ -55,3 +55,18 @@ function post_new_post(params)
   end
   return redirect('/')
 end
+
+
+function post_my_get(params)
+  if sessions[params.session_id].user == nil then return redirect('/') end
+  local res, err = pg:query(
+    string.format(
+      'select id, title, updated_at from posts where user_id = %d',
+      sessions[params.session_id].user.id
+    )
+  )
+
+  local newparams = shallow_clone(params)
+  newparams.posts = res
+  return view('myposts', newparams)
+end

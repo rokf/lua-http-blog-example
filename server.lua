@@ -94,6 +94,9 @@ template_pairs = {
   },
   ['templates/newpost.etlua'] = {
     name = 'newpost'
+  },
+  ['templates/myposts.etlua'] = {
+    name = 'myposts'
   }
 }
 
@@ -132,6 +135,7 @@ r:match({
     ['/posts'] = post_all_get,
     ['/new_post'] = post_new_get,
     ['/posts/:postid'] = post_single_get,
+    ['/myposts'] = post_my_get
   },
   POST = {
     ['/login'] = login_post,

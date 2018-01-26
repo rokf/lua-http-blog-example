@@ -1,0 +1,28 @@
+<table class="collapse pv2 ba br2 b--black-30 mt2 w-100">
+  <tr class="striped--light-gray">
+    <th class="pv2 ph3 ttu">Title</th>
+    <th class="pv2 ph3 ttu">Updated at</th>
+    <th class="pv2 ph3 ttu tr">Edit</th>
+    <th class="pv2 ph3 ttu tr">Remove</th>
+  </tr>
+  <% for _,post in ipairs(posts) do %>
+  <tr class="striped--light-gray">
+    <td class="pv2 ph3 tc"><%- post.title -%></td>
+    <td class="pv2 ph3 tc"><%- string.sub(post.updated_at,1,19) -%></td>
+    <td class="pv2 ph3 tr">
+      <form method="POST" action="/edit_post">
+        <%- csrf_token(session_id) -%>
+        <input type="hidden" name="postid" value="<%- post.id -%>">
+        <button type="submit">Edit</button>
+      </form>
+    </td>
+    <td class="pv2 ph3 tr">
+      <form method="POST" action="/delete_post">
+        <%- csrf_token(session_id) -%>
+        <input type="hidden" name="postid" value="<%- post.id -%>">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+  <% end %>
+</table>
