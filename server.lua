@@ -220,6 +220,7 @@ cq:wrap(function ()
           }
         end
 
+        -- csrf gets reset on every GET request
         if method == "GET" then
           sessions[session_id].csrf = nil
         end

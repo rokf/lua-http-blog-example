@@ -36,6 +36,7 @@ function post_new_get(params)
 end
 
 function post_new_post(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
   if #params.query.title < 5 or #params.query.article < 100 then
     sessions[params.session_id].errors = {
@@ -73,6 +74,7 @@ end
 
 -- delete post
 function post_delete(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
   if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
   local res,err = pg:query(
@@ -97,6 +99,7 @@ end
 
 -- GET the edit view
 function post_edit_get(params)
+  -- NOTICE ME SENPAI can not check for csrf here because it is a GET request
   if sessions[params.session_id].user == nil then return redirect('/') end
   if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
   local pid = params.query.postid
@@ -117,6 +120,7 @@ end
 
 -- POST the edit
 function post_edit_post(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
   if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
 
