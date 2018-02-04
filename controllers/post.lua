@@ -21,11 +21,31 @@ function post_single_get(params)
     )
   )
 
+  local is_favorite = false
+
+  if sessions[params.session_id].user ~= nil then
+    local res3, err3 = pg:query(
+      string.format(
+        'select user_id, post_id from favorites where user_id = %d and post_id = %s',
+        sessions[params.session_id].user.id,
+        params.postid
+      )
+    )
+
+    if res3 == nil then return redirect('/') end
+
+    if #res3 > 0 then
+      is_favorite = true
+    end
+  end
+
+
   if res == nil or #res == 0 then return redirect('/') end
   if res2 == nil then return redirect('/') end
 
   local newparams = shallow_clone(params)
   newparams.post = res[1]
+  newparams.is_favorite = is_favorite
   newparams.comments = res2
   return view('post', newparams)
 end
@@ -144,4 +164,54 @@ function post_edit_post(params)
   end
 
   return redirect('/myposts')
+end
+
+function post_favorite(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
+  if sessions[params.session_id].user == nil then return redirect('/') end
+
+  local res,err = pg:query(
+    string.format(
+      'insert into favorites (user_id, post_id) values (%d, %s)',
+      sessions[params.session_id].user.id,
+      pg:escape_literal(params.query.postid)
+    )
+  )
+
+  if res ~= nil then
+    sessions[params.session_id].messages = {
+      'The post has been added to your favorites'
+    }
+  else
+    sessions[params.session_id].errors = {
+      'An error occured, the post could not be added to your favorites'
+    }
+  end
+
+  return redirect('/posts/' .. pg:escape_literal(params.query.postid))
+end
+
+function post_unfavorite(params)
+  if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
+  if sessions[params.session_id].user == nil then return redirect('/') end
+
+  local res,err = pg:query(
+    string.format(
+      'delete from favorites where user_id = %d and post_id = %s',
+      sessions[params.session_id].user.id,
+      pg:escape_literal(params.query.postid)
+    )
+  )
+
+  if res ~= nil then
+    sessions[params.session_id].messages = {
+      'The post has been removed from your favorites'
+    }
+  else
+    sessions[params.session_id].errors = {
+      'An error occured, the post could not be removed from your favorites'
+    }
+  end
+
+  return redirect('/posts/' .. pg:escape_literal(params.query.postid))
 end

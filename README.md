@@ -20,3 +20,5 @@ The main file is called `server.lua`.
 without blocking; `etlua` is used for template rendering; `pgmoon` talks to PostgreSQL;
 `router` does the (you've guesed it) routing and `luafilesystem` checks for template modifications
 for autoreloading (while developing).
+
+Icons are from http://adamwhitcroft.com/batch/

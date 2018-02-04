@@ -150,7 +150,9 @@ r:match({
     ['/new_post'] = post_new_post,
     ['/comment'] = comment_insert,
     ['/edit_post'] = post_edit_post,
-    ['/delete_post'] = post_delete
+    ['/delete_post'] = post_delete,
+    ['/post_favorite'] = post_favorite,
+    ['/post_unfavorite'] = post_unfavorite
   }
 })
 

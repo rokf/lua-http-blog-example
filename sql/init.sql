@@ -22,3 +22,8 @@ create table comments (
   txt text not null,
   created_at timestamp
 );
+
+create table favorites (
+  post_id integer not null,
+  user_id integer not null
+)
