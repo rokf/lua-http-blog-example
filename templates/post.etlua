@@ -2,19 +2,23 @@
 <div>
   <div class="flex justify-between">
     <a class="f3 tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
-
-    <% if sessions[session_id].user ~= nil then %>
-      <% if is_favorite == true then %>
-      <form method="POST" action="/post_unfavorite">
-        <input type="image" src="static/heart-full.png" width="32">
+    <div class="flex">
+      <p class="mv0 pv2 ph2"><%- favorite_count -%></p>
+      <% if sessions[session_id].user ~= nil then %>
+        <% if is_favorite == true then %>
+        <form method="POST" action="/post_unfavorite">
+          <input type="image" src="static/heart-full.png" width="32">
+        <% else %>
+        <form method="POST" action="/post_favorite">
+          <input type="image" src="static/heart-empty.png" width="32">
+        <% end %>
+          <input type="hidden" name="postid" value="<%- post.id -%>">
+          <%- csrf_token(session_id) -%>
+        </form>
       <% else %>
-      <form method="POST" action="/post_favorite">
-        <input type="image" src="static/heart-empty.png" width="32">
+        <img src="static/heart-half.png" width="32">
       <% end %>
-        <input type="hidden" name="postid" value="<%- post.id -%>">
-        <%- csrf_token(session_id) -%>
-      </form>
-    <% end %>
+    </div>
   </div>
   <p class="i fw4"><span class="fw1">by</span> <%- post.author -%></p>
   <p class="f5 lh-copy"><%- post.article -%></p>

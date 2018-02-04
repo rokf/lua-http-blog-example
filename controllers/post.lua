@@ -21,10 +21,23 @@ function post_single_get(params)
     )
   )
 
+  local favorite_count = 0
+
+  local res3, err3 = pg:query(
+    string.format(
+      'select user_id, post_id from favorites where post_id = %s',
+      params.postid
+    )
+  )
+
+  if res3 == nil then return redirect('/') end
+
+  favorite_count = #res3
+
   local is_favorite = false
 
   if sessions[params.session_id].user ~= nil then
-    local res3, err3 = pg:query(
+    local res4, err4 = pg:query(
       string.format(
         'select user_id, post_id from favorites where user_id = %d and post_id = %s',
         sessions[params.session_id].user.id,
@@ -32,9 +45,9 @@ function post_single_get(params)
       )
     )
 
-    if res3 == nil then return redirect('/') end
+    if res4 == nil then return redirect('/') end
 
-    if #res3 > 0 then
+    if #res4 > 0 then
       is_favorite = true
     end
   end
@@ -46,6 +59,7 @@ function post_single_get(params)
   local newparams = shallow_clone(params)
   newparams.post = res[1]
   newparams.is_favorite = is_favorite
+  newparams.favorite_count = favorite_count
   newparams.comments = res2
   return view('post', newparams)
 end
