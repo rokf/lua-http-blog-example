@@ -1,0 +1,16 @@
+<div>
+<% if #posts > 0 then %>
+  <ul class="list pl0">
+  <% for _,post in ipairs(posts) do %>
+    <li class="flex justify-between mb3">
+      <a class="f5 tracked black dim lh-title link fw6" href="/posts/<%- post.pid -%>"><%- post.title -%></a>
+      <p class="i fw4 mv0"><span class="fw1">by</span> <%- post.author -%></p>
+    </li>
+  <% end %>
+  </ul>
+<% else %>
+  <p>
+    You have no favorites!
+  </p>
+<% end %>
+</div>

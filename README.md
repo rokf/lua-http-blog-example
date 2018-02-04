@@ -5,7 +5,7 @@ This is an example (backend only, no JS) web application written with the amazin
 modules.
 
 The website is a portal where one can register an account and write posts.
-Posts can receive comments, be edited and deleted.
+Posts can receive comments, be edited, added to favorites and deleted.
 Users can change their password, display name and e-mail.
 
 Sessions are handled via cookies and an internal sessions state. The application also has

@@ -100,7 +100,10 @@ template_pairs = {
   },
   ['templates/editpost.etlua'] = {
     name = 'editpost'
-  }
+  },
+  ['templates/favorites.etlua'] = {
+    name = 'favorites'
+  },
 }
 
 for pth,tidx in pairs(template_pairs) do
@@ -139,7 +142,8 @@ r:match({
     ['/new_post'] = post_new_get,
     ['/posts/:postid'] = post_single_get,
     ['/myposts'] = post_my_get,
-    ['/edit_post'] = post_edit_get
+    ['/edit_post'] = post_edit_get,
+    ['/favorites'] = post_favorites_get
   },
   POST = {
     ['/login'] = login_post,

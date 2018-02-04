@@ -215,3 +215,24 @@ function post_unfavorite(params)
 
   return redirect('/posts/' .. pg:escape_literal(params.query.postid))
 end
+
+function post_favorites_get(params)
+  if sessions[params.session_id].user == nil then return redirect('/') end
+
+  local res, err = pg:query(
+    string.format(
+      [[
+      select p.title, u.name as author, p.id as pid
+      from posts as p, users as u, favorites as f
+      where u.id = p.user_id and p.id = f.post_id and f.user_id = %d
+      ]],
+      sessions[params.session_id].user.id
+    )
+  )
+
+  if res == nil then return redirect('/') end
+
+  local newparams = shallow_clone(params)
+  newparams.posts = res
+  return view('favorites', newparams)
+end
