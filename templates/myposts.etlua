@@ -7,7 +7,7 @@
   </tr>
   <% for _,post in ipairs(posts) do %>
   <tr class="striped--light-gray">
-    <td class="pv2 ph3 tc"><%- post.title -%></td>
+    <td class="pv2 ph3 tc"><a class="link underline black" href="/posts/<%- post.id -%>"><%- post.title -%></a></td>
     <td class="pv2 ph3 tc"><%- string.sub(post.updated_at,1,19) -%></td>
     <td class="pv2 ph3 tr">
       <form method="GET" action="/edit_post">
