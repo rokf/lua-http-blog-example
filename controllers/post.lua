@@ -126,6 +126,13 @@ function post_delete(params)
         pg:escape_literal(params.query.postid)
       )
     )
+    -- delete favorites related to post
+    local res,err = pg:query(
+      string.format(
+        'delete from favorites where post_id = %s',
+        pg:escape_literal(params.query.postid)
+      )
+    )
   end
 
   return redirect('/myposts')
