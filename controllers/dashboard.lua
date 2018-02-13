@@ -11,10 +11,10 @@ function dashboard_update_profile(params)
   end
 
   if sessions[params.session_id].user ~= nil then
-    local res, err = pg:query(
-      string.format('update users set name = %s where id = %d',
-        pg:escape_literal(drpl(params.query.name)),
-        pg:escape_literal(sessions[params.session_id].user.id)
+    local res = pg:exec(
+      string.format([[update users set name = %s where id = %d]],
+        escape(drpl(params.query.name)),
+        escape(sessions[params.session_id].user.id)
       )
     )
     if res ~= nil then
@@ -31,10 +31,10 @@ function dashboard_update_email(params)
 
   if sessions[params.session_id].user ~= nil and
     params.query.email == params.query.email_copy then
-    local res, err = pg:query(
-      string.format('update users set email = %s where id = %d',
-        pg:escape_literal(params.query.email),
-        pg:escape_literal(sessions[params.session_id].user.id)
+    local res = pg:exec(
+      string.format([[update users set email = %s where id = %d]],
+        escape(params.query.email),
+        escape(sessions[params.session_id].user.id)
       )
     )
     if res ~= nil then
@@ -52,20 +52,20 @@ function dashboard_update_password(params)
   if sessions[params.session_id].user ~= nil and
     params.query.password == params.query.password_copy then
     -- check old password
-    local res, err = pg:query(
-      string.format('select id, password from users where id = %d',
-        pg:escape_literal(sessions[params.session_id].user.id)
+    local res = pg:exec(
+      string.format([[select id, password from users where id = %d]],
+        escape(sessions[params.session_id].user.id)
       )
     )
 
     if res == nil then return redirect('/') end
 
-    if res[1].password == hash_pass(params.query.old_password) then
+    if res_to_table(res)[1].password == hash_pass(params.query.old_password) then
       -- update password
-      local res2, err2 = pg:query(
-        string.format('update users set password = %s where id = %d',
-          pg:escape_literal(hash_pass(params.query.password)),
-          pg:escape_literal(sessions[params.session_id].user.id)
+      local res2 = pg:exec(
+        string.format([[update users set password = %s where id = %d]],
+          escape(hash_pass(params.query.password)),
+          escape(sessions[params.session_id].user.id)
         )
       )
     end

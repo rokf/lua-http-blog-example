@@ -17,7 +17,7 @@ function arguments (for the sake of simplicity).
 The main file is called `server.lua`.
 
 `lua-http` handles everything related to requests; `cqueues` allows the code to run
-without blocking; `etlua` is used for template rendering; `pgmoon` talks to PostgreSQL;
+without blocking; `etlua` is used for template rendering; `cqueues-pgsql` talks to PostgreSQL;
 `router` does the (you've guesed it) routing and `luafilesystem` checks for template modifications
 for autoreloading (while developing).
 

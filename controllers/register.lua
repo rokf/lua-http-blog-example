@@ -8,17 +8,17 @@ function register_post(params)
     return redirect('/')
   end
 
-  local res, err = pg:query(
-    string.format('insert into users (name, email, password, created_at) values (%s,%s,%s,localtimestamp)',
-      pg:escape_literal(drpl(params.query.name)),
-      pg:escape_literal(params.query.email),
-      pg:escape_literal(hash_pass(params.query.password))
+  local res = pg:exec(
+    string.format([[insert into users (name, email, password, created_at) values (%s,%s,%s,localtimestamp)]],
+      escape(drpl(params.query.name)),
+      escape(params.query.email),
+      escape(hash_pass(params.query.password))
     )
   )
 
-  local res2, err2 = pg:query(
-    string.format('select id, email from users where email = %s',
-      pg:escape_literal(params.query.email)
+  local res2 = pg:exec(
+    string.format([[select id, email from users where email = %s]],
+      escape(params.query.email)
     )
   )
 
@@ -26,7 +26,7 @@ function register_post(params)
     sessions[params.session_id].user = {
       email = params.query.email,
       name = drpl(params.query.name),
-      id = res2[1].id,
+      id = res_to_table(res2)[1].id,
     }
     sessions[params.session_id].messages = {
       'Welcome to the platform!'

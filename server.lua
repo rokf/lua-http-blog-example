@@ -15,7 +15,7 @@ local router = require 'router'
 local r = router.new()
 
 local etlua = require 'etlua'
-local pgmoon = require 'pgmoon'
+local pgsql = require "cqueues_pgsql"
 
 local lfs = require 'lfs'
 
@@ -34,6 +34,9 @@ require 'controllers.dashboard'
 require 'controllers.post'
 require 'controllers.comment'
 
+pg = pgsql.connectdb("dbname=blog host=localhost port=5432 user=postgres")
+assert(pg:status() == pgsql.CONNECTION_OK)
+
 -- global variables
 config = dofile('config.lua')
 sessions = {}
@@ -44,15 +47,6 @@ templates = {
     t_file:close()
   end
 }
-pg = pgmoon.new({
-  host = config.host,
-  port = tostring(config.pgport),
-  database = config.dbname,
-  user = config.dbuser,
-  socket_type = config.socket_type
-})
-
-assert(pg:connect())
 
 local cq = cqueues.new()
 
@@ -64,7 +58,7 @@ cq:wrap(function ()
   while true do
     signo = sl:wait(0.5)
     if signo == signal.SIGINT then
-      pg:disconnect()
+      -- pg:finish()
       os.exit(true)
     end
   end
@@ -238,7 +232,8 @@ cq:wrap(function ()
           session = sessions[session_id]
         }
 
-        local route_found, data = r:execute(method, just_path, route_data)
+        local route_found, data
+        route_found, data = r:execute(method, just_path, route_data)
 
         if not route_found then
           resh:upsert(':status','404')

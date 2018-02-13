@@ -11,22 +11,25 @@ function login_post(params)
     return redirect('/')
   end
 
-  local res, err = pg:query(
-    string.format('select id,name,email,password from users where email = %s',
-      pg:escape_literal(params.query.email)
+  local res = pg:exec(
+    string.format([[
+      select id,name,email,password from users where email = %s
+      ]],
+      escape(params.query.email)
     )
   )
 
   local pwhash = hash_pass(params.query.password)
-  if res ~= nil and #res > 0 then
-    if res[1].password == pwhash then
+  if res ~= nil and res:ntuples() > 0 then
+    local res_t = res_to_table(res)
+    if res_t[1].password == pwhash then
       sessions[params.session_id].user = {
-        email = res[1].email,
-        name = res[1].name,
-        id = res[1].id
+        email = res_t[1].email,
+        name = res_t[1].name,
+        id = res_t[1].id
       }
       sessions[params.session_id].messages = {
-        'Welcome back ' .. res[1].name .. '!'
+        'Welcome back ' .. res_t[1].name .. '!'
       }
     else
       sessions[params.session_id].errors = {

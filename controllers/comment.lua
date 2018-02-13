@@ -2,11 +2,11 @@ function comment_insert(params)
   if sessions[params.session_id].user == nil then return redirect('/') end
   if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
 
-  local res, err = pg:query(
+  local res = pg:exec(
     string.format("insert into comments (post_id, user_id, txt, created_at) values (%s,%d,%s,localtimestamp)",
       params.query.postid,
       sessions[params.session_id].user.id,
-      pg:escape_literal(drpl(params.query.txt))
+      escape(drpl(params.query.txt))
     )
   )
 

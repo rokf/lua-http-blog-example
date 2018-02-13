@@ -55,3 +55,26 @@ gen_ct = function (path)
   if s == nil or lt[s] == nil then return 'text/plain' end
   return lt[s]
 end
+
+escape = function (x)
+  local t = type(x)
+  if t == "number" then
+    return tostring(x)
+  elseif t == "string" then
+    return string.format("'%s'", string.gsub(x, "'", "''"))
+  elseif t == "boolean" then
+    return x and "true" or "false"
+  end
+end
+
+res_to_table = function (r)
+  local t = {}
+  for i=1, r:ntuples() do
+    local nt = {}
+    for j=1, r:nfields() do
+      nt[r:fname(j)] = r:getvalue(i, j)
+    end
+    table.insert(t,nt)
+  end
+  return t
+end

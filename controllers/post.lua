@@ -1,45 +1,67 @@
 
 function post_all_get(params)
-  local res, err = pg:query('select p.id, p.title, u.name as author, p.article from users as u, posts as p where u.id = p.user_id')
+  local res = pg:exec([[
+  select p.id, p.title, u.name as author, p.article
+  from users as u, posts as p
+  where u.id = p.user_id
+  ]])
   local newparams = shallow_clone(params)
-  newparams.posts = res
+  newparams.posts = res_to_table(res)
+
+
   return view('posts',newparams)
 end
 
 function post_single_get(params)
-  local res, err = pg:query(
+  local res = pg:exec(
     string.format(
-      'select p.id, p.title, u.name as author, p.article from users as u, posts as p where u.id = p.user_id and p.id = %s',
+      [[
+      select p.id, p.title, u.name as author, p.article
+      from users as u, posts as p
+      where u.id = p.user_id and p.id = %s
+      ]],
       params.postid
     )
   )
 
-  local res2, err2 = pg:query(
+  local res2 = pg:exec(
     string.format(
-      'select c.txt, u.name as author, c.created_at from users as u, comments as c where u.id = c.user_id and c.post_id = %s',
+      [[
+      select c.txt, u.name as author, c.created_at
+      from users as u, comments as c
+      where u.id = c.user_id and c.post_id = %s
+      ]],
       params.postid
     )
   )
 
   local favorite_count = 0
 
-  local res3, err3 = pg:query(
+  local res3 = pg:exec(
     string.format(
-      'select user_id, post_id from favorites where post_id = %s',
+      [[
+      select user_id, post_id
+      from favorites
+      where post_id = %s
+      ]],
       params.postid
     )
   )
 
   if res3 == nil then return redirect('/') end
 
-  favorite_count = #res3
+  favorite_count = res3:ntuples() or 0 -- TODO: check
 
   local is_favorite = false
 
   if sessions[params.session_id].user ~= nil then
-    local res4, err4 = pg:query(
+    local res4 = pg:exec(
       string.format(
-        'select user_id, post_id from favorites where user_id = %d and post_id = %s',
+        [[
+        select user_id, post_id
+        from favorites
+        where user_id = %d and post_id = %s
+        ]],
         sessions[params.session_id].user.id,
         params.postid
       )
@@ -47,20 +69,20 @@ function post_single_get(params)
 
     if res4 == nil then return redirect('/') end
 
-    if #res4 > 0 then
+    if res4:ntuples() > 0 then
       is_favorite = true
     end
   end
 
 
-  if res == nil or #res == 0 then return redirect('/') end
+  if res == nil or res:ntuples() == 0 then return redirect('/') end
   if res2 == nil then return redirect('/') end
 
   local newparams = shallow_clone(params)
-  newparams.post = res[1]
+  newparams.post = res_to_table(res)[1]
   newparams.is_favorite = is_favorite
   newparams.favorite_count = favorite_count
-  newparams.comments = res2
+  newparams.comments = res_to_table(res2)
   return view('post', newparams)
 end
 
@@ -78,11 +100,15 @@ function post_new_post(params)
     }
     return redirect('/')
   end
-  local res,err = pg:query(
-    string.format("insert into posts (title, user_id, article, created_at, updated_at) values (%s,%d,%s,localtimestamp,localtimestamp)",
-      pg:escape_literal(drpl(params.query.title)),
+  local res = pg:exec(
+    string.format(
+      [[
+      insert into posts (title, user_id, article, created_at, updated_at)
+      values (%s,%d,%s,localtimestamp,localtimestamp)
+      ]],
+      escape(drpl(params.query.title)),
       sessions[params.session_id].user.id,
-      pg:escape_literal(drpl(params.query.article))))
+      escape(drpl(params.query.article))))
   if res ~= nil then
     sessions[params.session_id].messages = {
       ("You've just published an article entitled '%s'!"):format(drpl(params.query.title))
@@ -94,15 +120,15 @@ end
 
 function post_my_get(params)
   if sessions[params.session_id].user == nil then return redirect('/') end
-  local res, err = pg:query(
+  local res = pg:exec(
     string.format(
-      'select id, title, user_id, updated_at from posts where user_id = %d',
+      [[select id, title, user_id, updated_at from posts where user_id = %d]],
       sessions[params.session_id].user.id
     )
   )
 
   local newparams = shallow_clone(params)
-  newparams.posts = res
+  newparams.posts = res_to_table(res)
   return view('myposts', newparams)
 end
 
@@ -111,26 +137,26 @@ function post_delete(params)
   if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
   if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
-  local res,err = pg:query(
+  local res = pg:exec(
     string.format(
-      'delete from posts where id = %s',
-      pg:escape_literal(params.query.postid)
+      [[delete from posts where id = %s]],
+      escape(params.query.postid)
     )
   )
 
   if res ~= nil then
     -- delete comments related to post
-    local res,err = pg:query(
+    local res = pg:exec(
       string.format(
-        'delete from comments where post_id = %s',
-        pg:escape_literal(params.query.postid)
+        [[delete from comments where post_id = %s]],
+        escape(params.query.postid)
       )
     )
     -- delete favorites related to post
-    local res,err = pg:query(
+    local res = pg:exec(
       string.format(
-        'delete from favorites where post_id = %s',
-        pg:escape_literal(params.query.postid)
+        [[delete from favorites where post_id = %s]],
+        escape(params.query.postid)
       )
     )
   end
@@ -146,15 +172,15 @@ function post_edit_get(params)
   local pid = params.query.postid
   local uid = params.query.userid
 
-  local res,err = pg:query(
+  local res  = pg:exec(
     string.format(
-      'select id, title, user_id, article from posts where id = %s',
-      pg:escape_literal(params.query.postid)
+      [[select id, title, user_id, article from posts where id = %s]],
+      escape(params.query.postid)
     )
   )
 
   local newparams = shallow_clone(params)
-  newparams.post = res[1]
+  newparams.post = res_to_table(res)[1]
 
   return view('editpost',newparams)
 end
@@ -165,12 +191,16 @@ function post_edit_post(params)
   if sessions[params.session_id].user == nil then return redirect('/') end
   if tostring(sessions[params.session_id].user.id) ~= params.query.userid then return redirect('/') end
 
-  local res,err = pg:query(
+  local res = pg:exec(
     string.format(
-      'update posts set updated_at = localtimestamp, title = %s, article = %s where id = %s',
-      pg:escape_literal(drpl(params.query.title)),
-      pg:escape_literal(drpl(params.query.article)),
-      pg:escape_literal(params.query.postid)
+      [[
+      update posts
+      set updated_at = localtimestamp, title = %s, article = %s
+      where id = %s
+      ]],
+      escape(drpl(params.query.title)),
+      escape(drpl(params.query.article)),
+      escape(params.query.postid)
     )
   )
 
@@ -191,11 +221,11 @@ function post_favorite(params)
   if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
 
-  local res,err = pg:query(
+  local res = pg:exec(
     string.format(
-      'insert into favorites (user_id, post_id) values (%d, %s)',
+      [[insert into favorites (user_id, post_id) values (%d, %s)]],
       sessions[params.session_id].user.id,
-      pg:escape_literal(params.query.postid)
+      escape(params.query.postid)
     )
   )
 
@@ -209,18 +239,18 @@ function post_favorite(params)
     }
   end
 
-  return redirect('/posts/' .. pg:escape_literal(params.query.postid))
+  return redirect('/posts/' .. escape(params.query.postid))
 end
 
 function post_unfavorite(params)
   if params.query.csrf_token ~= sessions[params.session_id].csrf then return redirect('/') end
   if sessions[params.session_id].user == nil then return redirect('/') end
 
-  local res,err = pg:query(
+  local res = pg:exec(
     string.format(
-      'delete from favorites where user_id = %d and post_id = %s',
+      [[delete from favorites where user_id = %d and post_id = %s]],
       sessions[params.session_id].user.id,
-      pg:escape_literal(params.query.postid)
+      escape(params.query.postid)
     )
   )
 
@@ -234,13 +264,13 @@ function post_unfavorite(params)
     }
   end
 
-  return redirect('/posts/' .. pg:escape_literal(params.query.postid))
+  return redirect('/posts/' .. escape(params.query.postid))
 end
 
 function post_favorites_get(params)
   if sessions[params.session_id].user == nil then return redirect('/') end
 
-  local res, err = pg:query(
+  local res = pg:exec(
     string.format(
       [[
       select p.title, u.name as author, p.id as pid
@@ -254,6 +284,6 @@ function post_favorites_get(params)
   if res == nil then return redirect('/') end
 
   local newparams = shallow_clone(params)
-  newparams.posts = res
+  newparams.posts = res_to_table(res)
   return view('favorites', newparams)
 end
