@@ -1,9 +1,9 @@
 
 function post_all_get(params)
   local res = pg:exec([[
-  select p.id, p.title, u.name as author, p.article
-  from users as u, posts as p
-  where u.id = p.user_id
+    select p.id, p.title, u.name as author, p.article
+    from users as u, posts as p
+    where u.id = p.user_id
   ]])
   local newparams = shallow_clone(params)
   newparams.posts = res_to_table(res)
@@ -17,14 +17,14 @@ function post_single_get(params)
     select p.id, p.title, u.name as author, p.article
     from users as u, posts as p
     where u.id = p.user_id and p.id = $1
-    ]],
+  ]],
   tonumber(params.postid))
 
   local res2 = pg:execParams([[
     select c.txt, u.name as author, c.created_at
     from users as u, comments as c
     where u.id = c.user_id and c.post_id = $1
-    ]],
+  ]],
   tonumber(params.postid))
 
   local favorite_count = 0
@@ -33,7 +33,7 @@ function post_single_get(params)
     select user_id, post_id
     from favorites
     where post_id = $1
-    ]],
+  ]],
   tonumber(params.postid))
 
   if res3 == nil or res3:status() ~= 2 then return redirect('/') end
@@ -47,7 +47,7 @@ function post_single_get(params)
       select user_id, post_id
       from favorites
       where user_id = $1 and post_id = $2
-      ]],
+    ]],
     tonumber(sessions[params.session_id].user.id),
     tonumber(params.postid))
 

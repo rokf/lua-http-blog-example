@@ -6,19 +6,19 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
   </head>
-  <body class="mw7 center">
-    <header class="flex justify-between">
-      <a class="f1 lh-title tracked link ma0 pa0 gray" href="/">Blog</h1>
+  <body class="ph1 ph0-ns ph1-m mw7 center">
+    <header class="flex justify-between flex-wrap">
+      <a class="f3 f1-ns lh-title tracked link ma0 pa0 gray" href="/"><%- title -%></h1>
       <div class="flex justify-center content-center">
         <% if session.user then %>
-          <a class="link ph1 pv2 black underline tc" href="/dashboard"><%- session.user.name -%></a>
-          <a class="link ph1 pv2 black underline tc" href="/new_post">Write</a>
-          <a class="link ph1 pv2 black underline tc" href="/myposts">My posts</a>
-          <a class="link ph1 pv2 black underline tc" href="/favorites">Favorites</a>
-          <a class="link ph1 pv2 black underline tc" href="/logout">Logout</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/dashboard"><%- session.user.name -%></a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/new_post">Write</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/myposts">My posts</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/favorites">Favorites</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/logout">Logout</a>
         <% else %>
-          <a class="link ph1 pv2 black underline tc" href="/login">Login</a>
-          <a class="link ph1 pv2 black underline tc" href="/register">Register</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/login">Login</a>
+          <a class="link ph1 pv2 black underline tc f7 f5-ns" href="/register">Register</a>
         <% end %>
       </div>
     </header>

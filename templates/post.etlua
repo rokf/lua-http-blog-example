@@ -1,7 +1,7 @@
 <!-- post display -->
 <div>
   <div class="flex justify-between">
-    <a class="f3 tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
+    <a class="f4 f3-ns tracked black dim lh-title link fw6" href="/posts/<%- post.id -%>"><%- post.title -%></a>
     <div class="flex">
       <p class="mv0 pv2 ph2"><%- favorite_count -%></p>
       <% if sessions[session_id].user ~= nil then %>
