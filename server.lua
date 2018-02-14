@@ -34,8 +34,6 @@ require 'controllers.dashboard'
 require 'controllers.post'
 require 'controllers.comment'
 
-pg = pgsql.connectdb("dbname=blog host=localhost port=5432 user=postgres")
-assert(pg:status() == pgsql.CONNECTION_OK)
 
 -- global variables
 config = dofile('config.lua')
@@ -48,8 +46,13 @@ templates = {
   end
 }
 
+-- postgres connection
+pg = pgsql.connectdb(config.pg_con_string)
+assert(pg:status() == pgsql.CONNECTION_OK)
+
 local cq = cqueues.new()
 
+-- interrupt handling
 local sl = signal.listen(signal.SIGINT)
 signal.block(signal.SIGINT)
 
@@ -58,7 +61,7 @@ cq:wrap(function ()
   while true do
     signo = sl:wait(0.5)
     if signo == signal.SIGINT then
-      -- pg:finish()
+      pg:finish()
       os.exit(true)
     end
   end
@@ -104,6 +107,7 @@ for pth,tidx in pairs(template_pairs) do
   templates:upsert(tidx.name,pth)
 end
 
+-- template reloading
 if config.dev then
   cq:wrap(function ()
     while true do

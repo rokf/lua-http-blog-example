@@ -11,16 +11,15 @@ function login_post(params)
     return redirect('/')
   end
 
-  local res = pg:exec(
-    string.format([[
-      select id,name,email,password from users where email = %s
-      ]],
-      escape(params.query.email)
-    )
-  )
+  local res = pg:execParams([[
+    select id,name,email,password
+    from users
+    where email = $1
+    ]],
+  params.query.email)
 
   local pwhash = hash_pass(params.query.password)
-  if res ~= nil and res:ntuples() > 0 then
+  if res ~= nil and res:status() == 2 and res:ntuples() > 0 then
     local res_t = res_to_table(res)
     if res_t[1].password == pwhash then
       sessions[params.session_id].user = {
