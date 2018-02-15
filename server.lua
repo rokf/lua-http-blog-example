@@ -158,12 +158,16 @@ r:match({
   }
 })
 
+-- timeout in seconds
+local TIMEOUT = 1
+
 cq:wrap(function ()
   local s = server.listen({
     host = config.host,
     port = config.port,
     onstream = function(_, st)
-      local reqh = st:get_headers()
+      local reqh = st:get_headers(TIMEOUT)
+      if reqh == nil then st:shutdown(); return end
       local method = reqh:get(':method')
       local path = reqh:get(':path')
 
@@ -183,16 +187,25 @@ cq:wrap(function ()
           print('serving static', p)
           resh:upsert(":status", "200")
           resh:append("content-type", gen_ct(p))
-          st:write_headers(resh, false)
-          st:write_body_from_file(file)
+          if st:write_headers(resh, false, TIMEOUT) == nil then
+            st:shutdown(); return
+          end
+
+          if st:write_body_from_file(file, TIMEOUT) == nil then
+            st:shutdown(); return
+          end
           file:close()
         else
           resh:upsert(":status", "404")
           -- resh:append("content-type", "text/plain; charset=utf-8")
-          st:write_headers(resh, true)
+          if st:write_headers(resh, true, TIMEOUT) == nil then
+            st:shutdown(); return
+          end
         end
       else
-        local body = assert(st:get_body_as_string())
+        local body = st:get_body_as_string(TIMEOUT)
+        if body == nil then st:shutdown(); return end
+
         if method == "POST" then
           just_query = body
         end
@@ -242,8 +255,12 @@ cq:wrap(function ()
         if not route_found then
           resh:upsert(':status','404')
           resh:upsert('content-type','text/html')
-          st:write_headers(resh, false)
-          st:write_body_from_string('404 not found!')
+          if st:write_headers(resh, false, TIMEOUT) == nil then
+            st:shutdown(); return
+          end
+          if st:write_body_from_string('404 not found!', TIMEOUT) == nil then
+            st:shutdown(); return
+          end
         else
           print('serving dynamic', just_path)
           resh:upsert(':status',tostring(data.status or 200))
@@ -255,9 +272,13 @@ cq:wrap(function ()
           if data.redirect then
             resh:upsert('Location',data.redirect)
           end
-          st:write_headers(resh, false)
+          if st:write_headers(resh, false, TIMEOUT) == nil then
+            st:shutdown(); return
+          end
           if not data.redirect then
-            st:write_body_from_string(data.txt)
+            if st:write_body_from_string(data.txt, TIMEOUT) == nil then
+              st:shutdown(); return
+            end
           end
         end
       end
