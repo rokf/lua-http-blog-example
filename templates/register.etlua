@@ -1,7 +1,7 @@
 <form class="flex flex-column mw5" method="POST" action="/register">
   <%- csrf_token(session_id) -%>
-  <input name="name" placeholder="name" class="mb2">
-  <input type="email" name="email" placeholder="email" class="mb2">
-  <input type="password" name="password" placeholder="password" class="mb2">
+  <input name="name" placeholder="name" class="mb2 input-reset pa1 ba b--gray br1">
+  <input type="email" name="email" placeholder="email" class="mb2 input-reset pa1 ba b--gray br1">
+  <input type="password" name="password" placeholder="password" class="mb2 input-reset pa1 ba b--gray br1">
   <button type="submit">Register</button>
 </form>

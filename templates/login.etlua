@@ -1,6 +1,6 @@
 <form class="flex flex-column mw5" method="POST" action="/login">
   <%- csrf_token(session_id) -%>
-  <input type="email" name="email" placeholder="email" class="mb2">
-  <input type="password" name="password" placeholder="password" class="mb2">
+  <input type="email" name="email" placeholder="email" class="mb2 input-reset pa1 ba b--gray br1">
+  <input type="password" name="password" placeholder="password" class="mb2 input-reset pa1 ba b--gray br1">
   <button type="submit">Login</button>
 </form>

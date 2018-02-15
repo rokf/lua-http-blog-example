@@ -29,7 +29,7 @@
   <form class="flex flex-column" method="POST" action="/comment">
     <%- csrf_token(session_id) -%>
     <input type="hidden" name="postid" value="<%- post.id -%>">
-    <textarea name="txt" rows="3" class="mb2"></textarea>
+    <textarea name="txt" rows="3" class="mb2 input-reset pa1 ba b--gray br1" style="resize: none"></textarea>
     <button type="submit">Add comment</button>
   </form>
 <% end %>

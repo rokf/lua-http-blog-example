@@ -4,8 +4,8 @@
     <%- csrf_token(session_id) -%>
     <input type="hidden" name="userid" value="<%- post.user_id -%>">
     <input type="hidden" name="postid" value="<%- post.id -%>">
-    <input name="title" value="<%- post.title -%>" placeholder="title" class="mb2">
-    <textarea name="article" rows="30" class="mb2">
+    <input name="title" value="<%- post.title -%>" placeholder="title" class="mb2 input-reset pa1 ba b--gray br1">
+    <textarea name="article" rows="30" class="mb2 input-reset pa1 ba b--gray br1" style="resize: none">
     <%- post.article -%>
     </textarea>
     <button type="submit">Submit</button>
