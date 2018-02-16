@@ -12,9 +12,7 @@ end
 
 shallow_clone = function (t)
   local nt = {}
-  for k,v in pairs(t) do
-    nt[k] = v
-  end
+  for k,v in pairs(t) do nt[k] = v end
   return nt
 end
 
@@ -54,17 +52,6 @@ gen_ct = function (path)
   local s = string.match(path,"(%.%a+)$")
   if s == nil or lt[s] == nil then return 'text/plain' end
   return lt[s]
-end
-
-escape = function (x)
-  local t = type(x)
-  if t == "number" then
-    return tostring(x)
-  elseif t == "string" then
-    return string.format("'%s'", string.gsub(x, "'", "''"))
-  elseif t == "boolean" then
-    return x and "true" or "false"
-  end
 end
 
 res_to_table = function (r)

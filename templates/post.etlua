@@ -20,7 +20,7 @@
       <% end %>
     </div>
   </div>
-  <p class="i fw4"><span class="fw1">by</span> <%- post.author -%></p>
+  <a class="link black dim db i fw4" href="/posts_of/<%- post.user_id -%>"><span class="fw1">by</span> <%- post.author -%></a>
   <p class="f5 lh-copy"><%- post.article -%></p>
 </div>
 

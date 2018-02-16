@@ -1,20 +1,34 @@
 
 function post_all_get(params)
   local res = pg:exec([[
-    select p.id, p.title, u.name as author, p.article
+    select p.id, p.title, u.name as author, p.user_id, p.article
     from users as u, posts as p
     where u.id = p.user_id
   ]])
   local newparams = shallow_clone(params)
   newparams.posts = res_to_table(res)
 
-
   return view('posts',newparams)
+end
+
+function posts_of_user_get(params)
+  local res = pg:execParams([[
+    select p.id, p.title, u.name as author, p.user_id , p.article
+    from users as u, posts as p
+    where u.id = p.user_id and p.user_id = $1
+  ]],
+  tonumber(params.userid))
+
+  if res == nil or res:status() ~= 2 then return redirect('/') end
+
+  local newparams = shallow_clone(params)
+  newparams.posts = res_to_table(res)
+  return view('posts', newparams)
 end
 
 function post_single_get(params)
   local res = pg:execParams([[
-    select p.id, p.title, u.name as author, p.article
+    select p.id, p.title, u.name as author, p.user_id, p.article
     from users as u, posts as p
     where u.id = p.user_id and p.id = $1
   ]],

@@ -139,6 +139,7 @@ r:match({
     ['/posts'] = post_all_get,
     ['/new_post'] = post_new_get,
     ['/posts/:postid'] = post_single_get,
+    ['/posts_of/:userid'] = posts_of_user_get,
     ['/myposts'] = post_my_get,
     ['/edit_post'] = post_edit_get,
     ['/favorites'] = post_favorites_get
