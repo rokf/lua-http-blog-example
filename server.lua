@@ -130,7 +130,6 @@ end
 --> ROUTES
 r:match({
   GET = {
-    -- ['/'] = function (params) return view('home', params) end,
     ['/'] = post_all_get,
     ['/login'] = login_get,
     ['/logout'] = logout_get,
